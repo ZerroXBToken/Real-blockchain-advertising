@@ -1,0 +1,62 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Blockchain Ads</title>
+<link rel="shortcut icon" href="./img/0xbt.png" type="image/x-icon">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+<script type="text/javascript" src="https://etherscan.io/jss/web3.min.js?v=0.20.6"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<style>
+  a { 
+    text-decoration: none; /* Отменяем подчеркивание у ссылки */
+    } 
+	button.knopka {
+	color: #fff; 
+	background: #828282; 
+	padding: 5px; 
+	border-radius: 5px;
+	border: 2px solid #teal;
+	} 
+	button.knopka:hover { 
+	background: #000; 
+	}
+</style>
+	
+</head>
+<body style="background-color:#000">
+<table border = "15" width ="100%" cellpadding = "5" cellspacing ="5" bordercolor="#000" bgcolor=""><tr><td>
+<div class="col-md-12">
+</div>
+<center>
+<span style="color:teal"><b>Your Blockchain Ads</b></span><br>
+<button class="knopka" id='btn_5'><a href="https://etherscan.io/writecontract/index.html?a=0x30783ee8fdf264f59a1846b24dbfc73ab4aa7d18&n=mainnet" title="Send your ads" target="_blank"><b><span style="color:white;">Send <i class="fa fa-btc"></i> Ads</span></b></a></button>
+<button type='button' id='btn_5' class="knopka" onclick="ethcall2('getAds', 'input_5','myanswer_5','string', '|string', 'btn_5');"><b>Get <i class="fa fa-btc"></i> Ads</b></button>
+<div align="left"><b><span id='myanswer_5' style="color:teal"></span></b></div>
+</center>
+<script>
+    var web3 = new Web3(new Web3.providers.HttpProvider("https://node3.web3api.com"));
+    
+    var version = web3.version.api;
+    console.log(version); 
+    var MyContract;
+    var myContractInstance;
+    try {
+        MyContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"getAds","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newAds","type":"string"}],"name":"setAds","outputs":[],"payable":true,"stateMutability":"payable","type":"function"}]);
+        myContractInstance = MyContract.at("0x30783ee8fdf264f59a1846b24dbfc73ab4aa7d18");
+    }
+    catch (err) {
+        console.log(err.message);
+    }    
+
+</script>
+<script type="text/javascript" src="./js/r4.js"></script>
+<center>
+<h6>
+<b style="color:grey;" title="0.002 Ether">*Price(0.002 Ether)</b><br>
+<b><a style="color:#3A5869"  href="https://ads.0xbt.net/index.html#idata"  target="_blank">*Manual</a></b>
+</h6>
+</center>
+</td></tr></table>
+</body>
+</html>
