@@ -1,0 +1,978 @@
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="shortcut icon" href="./img/0xbt.png" type="image/x-icon">
+<meta name="description" content="Binance Smart Chain Ads | 0xbt">  
+<title>Binance Smart Chain Ads | 0xbt</title>
+
+  <link rel="stylesheet" href="./css/mbr-additional.css" type="text/css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous"> 
+<!--<script type="text/javascript" src="https://etherscan.io/jss/web3.min.js?v=0.20.6"></script>-->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!--<script src="https://etherscan.io/assets/vendor/bootstrap/bootstrap.min.js?v=0.5.1.0"></script>-->
+
+
+<style type="text/css">
+        html {
+            font-size: 13px;
+        }
+
+        body {
+            font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+        }
+
+        a {
+            color: #3498db;
+        }
+
+            a:hover {
+                color: #1d6fa5;
+            }
+
+        .text-primary {
+            color: #3498db !important;
+        }
+
+        .btn-link:hover {
+            color: #1d6fa5;
+            text-decoration: none;
+        }
+
+        .card-btn-arrow {
+            display: inline-block;
+            color: #3498db;
+            margin-top: 5px;
+        }
+
+        #overlay {
+            /*background: #ffffff;*/
+            background: rgba(255,255,255,.7);
+            color: #666666;
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            z-index: 5000;
+            top: 0;
+            left: 0;
+            float: left;
+            text-align: center;
+            padding-top: 10%;
+            display: none;
+        }
+
+
+
+        a { 
+    text-decoration: none;
+        }     
+</style>
+
+
+</head>
+<body id="dappBody" style="background-image: url();" class="bg-img-hero-fixed bg-light">
+
+<table border = "15" width ="100%" height="100%" cellpadding = "20" cellspacing ="20" bordercolor="#364040" bgcolor="#575E60">		    
+<tr><td valign="top">
+
+<div class="d-sm-flex justify-content-between mb-3"><p class="ml-3 mr-3 mb-1"><i id="connector" class="fa fa-circle text-danger mr-1"></i>   <a id="connectWeb3" style="font-size: 12px!important" href="#" onclick="connectWeb3(); return false;">MetaMask</a></p></div>
+
+
+<div id='writeCollapse1' aria-labelledby='writeHeading1'>
+<div class='card-body'><form Class='mt-3'><input type='text' class='form-control form-control-xs mb-2' id='input_payable_setAds' name='payable_setAds' placeholder='&nbsp; Payable Amount (BNB)'><input type="text" class="form-control form-control-xs mb-2" id='writeInput_1_1' name='writeInput_1' data-type='string' placeholder='&nbsp; Your Ads (string)' /> 
+<button type="button" onclick="write0('setAds','writeInput_1')" class="btn btn-xs btn-primary disabled write-btn">Write</button> 
+<div style='display:inline' class='write-msg text-success writeInput_1'></div></form>
+<button type="button" onclick="self.close()" class="write-btn btn btn-xs btn-primary border disabled" id='btn_5'><span style="color:grey;">Close a window</span></button>
+
+</div></div>
+
+
+
+<script src="./js/web3-utils.min.js?v=20.9.2.0"></script>
+<script src="./js/web3-eth.min.js?v=20.9.2.0"></script>
+
+
+<script>        
+        window.isBackButton = false;
+        window.isFrInventory = false;
+        window.token_inventory_loaded = false;
+        window.isFrUserInventory = false;
+        window.token_user_inventory_loaded = false;
+
+        // var sid =  'ba9c83787d330a9abd166a23ca5e0473';
+        var eth;
+
+        window.mode = 'normal';
+
+        if (!!window.performance && window.performance.navigation.type === 2) {            
+            window.isFrInventory = false;
+            window.isFrUserInventory = false;
+            window.isBackButton = true;           
+        };
+
+        if (ethereum !== 'undefined') {
+            var eth = new Web3Eth(ethereum);
+        } else {
+            var eth = new Web3Eth(new Web3HttpProvider("https://data-seed-prebsc-1-s1.binance.org:8545"));
+        }
+        
+        //var MyContract;
+        var myContractInstance;
+        var myProxyContractInstance; //this is for an older implementation that reads a specific "implementation" function - Let's keep it here for now.
+        var myReadWriteProxyContractInstance;
+        var isAccount = false;
+        var net = 'bsc_testnet';
+        window.token_transfer_loaded = false;
+        window.token_erc721_transfer_loaded = false;
+        
+        try {
+            myContractInstance = new eth.Contract([{"type":"function","stateMutability":"view","payable":false,"outputs":[{"type":"string","name":""}],"name":"getAds","inputs":[],"constant":true},{"type":"function","stateMutability":"payable","payable":true,"outputs":[],"name":"setAds","inputs":[{"type":"string","name":"newAds"}],"constant":false}], "0x2C4E74BfA5245300797e803FF91eB8ed80340416");
+
+            
+                myProxyContractInstance = new eth.Contract("", "0x2C4E74BfA5245300797e803FF91eB8ed80340416");
+            
+
+        }
+        catch (err) {
+            console.log(err.message);
+        }
+
+        var ethEnabled = false;
+
+        function connectWeb3() {
+
+            if (typeof web3 !== 'undefined') {
+                var network = 0;
+                eth.net.getId((err, netId) => {
+                    network = netId.toString();
+                    switch (network) {
+                        case "1":
+                            network = 'mainnet'
+                            break
+                        case "2":
+                            network = 'morden'
+                            break
+                        case "3":
+                            network = 'ropsten';
+                            break
+                        case "4":
+                            network = 'rinkeby';
+                            break
+                        case "5":
+                            network = 'goerli';
+                            break;
+                        case "42":
+                            network = 'kovan';
+                            break
+                        case "246":
+                            network = 'ecw';
+                            break
+                        case "97":
+                            network = 'bsc_testnet';
+                            break
+                     default:
+                            console.log('This is an unknown network.')
+                    }
+
+                    if (network.toLowerCase() !== net.toLowerCase()) {
+                        alert("Please connect to " + net + ' network');
+                        return false;
+                    } else {
+                        if (typeof ethereum !== 'undefined') {
+
+                            ethereum.enable().then(function () {
+                                connectAccount();
+                            });
+                        } else {
+                            connectAccount();
+                            if (ethEnabled === false) {
+                                alert('Please connect to your Web3 provider!');
+                            }
+                        }
+                    }
+                })
+            } else {
+                alert('Unable to locate a compatible web3 browser!');
+            }
+        }
+
+        function connectAccount() {
+            eth.getAccounts(function (err, accounts) {
+                if (err) alert(err + '. Are you sure you are on a secure (SSL / HTTPS) connection?');
+
+                if (accounts.length > 0) {
+                    address = accounts[0];
+                    var isAddress = Web3Utils.isAddress(address);
+
+                    if (isAddress) {
+
+                        $('#connector').html("<i class='fa fa-circle text-success small mr-1'></i> Connected to Web3");
+                        eth.defaultAccount = accounts[0];                        
+
+                        isAccount = true;
+
+                        $('.write-btn').removeClass('disabled');
+                        ethEnabled = true;
+                        
+                        $("#ContentPlaceHolder1_hdnWalletAddress").val(accounts[0]);
+                        sessionStorage.setItem("userAddress", accounts[0]);
+                        $('#ContentPlaceHolder1_myCollectionTab').show();
+
+                        var hash = window.location.hash.substring(1);                        
+                        if (hash == "myCollection") {
+                            updatehash(hash);
+                            activaTab(hash);
+                        }
+                    }
+                } 
+            });
+        }
+
+
+        
+
+        function ethcall2(strMethodName, strInputElementName, strOutputElementName, strOutputtype, strOutputFieldNames, strBtnName) {        
+            var defaultAccount = "0x0000000000000000000000000000000000000000"
+            var functionNametoCall = "myContractInstance.methods." + strMethodName;
+            var result;
+            try {
+
+                var strparas;
+                var elms = document.querySelectorAll("[name=" + strInputElementName + "]");
+                //console.log("elms.length = " + elms.length);            
+                for (var i = 0; i < elms.length; i++) {
+                    if (i == 0) {
+                        strparas = "'" + add0xforAddress(Escape(elms[i].value)) + "'"
+                    } else {
+                        strparas = strparas + ",'" + Escape(elms[i].value) + "'"
+                    }
+                    if (elms[i].value == '') {
+                        document.getElementById(strInputElementName).focus();
+                        alert('Input value cannot be empty');
+                        return false;
+                    }
+                }
+                showLoading(true, strBtnName);
+
+                var f = ""
+                f += functionNametoCall + "(" + strparas + ")"
+                f += ".call("
+                f += "{from: '" + defaultAccount + "'}, "
+                f += "function(err, res){"
+                f += "if (err) {result = err;} else { result = res; } showMessage('" + strMethodName + "',result,'" + strOutputElementName + "','" + strOutputFieldNames + "','" + strBtnName +"'); "
+                f += "});"
+                new Function(f)();
+            
+               // result = eval(functionNametoCall + "(" + strparas + ");");
+               // $('#overlay').show();
+            }
+            catch (err) {
+                    alert(err)
+                //$('#overlay').show();
+                result = "" + err + "";
+                showLoading(false, strBtnName);
+            }
+            //setTimeout(function () {
+            //    $('#overlay').show();
+            //}, 2500);
+       
+            //document.getElementById(strOutputElementName).innerHTML = "<br><br> [&nbsp;<b>" + strMethodName + "</b> method Response ]<br>" + formatmultipleoutputs(result, strOutputFieldNames) + "<br>";  
+        }
+
+        function showMessage(strMethodName, result, strOutputElementName, strOutputFieldNames, strBtnName) {
+        document.getElementById(strOutputElementName).innerHTML = "<strong>" + strMethodName + " method Response: </strong>" + formatmultipleoutputs(result, strOutputFieldNames);
+        showLoading(false, strBtnName);  
+
+         //var obj = window.parent.document.getElementById('readcontractiframe');
+         //parent.resizeIframe(obj, 0);
+        }
+
+
+        function showLoading(isShow, strBtnName) {
+
+            if (isShow) {
+                $(" <img id='waiting_" + strBtnName + "' class='waitingImg' src='/images/ajax-loader2.gif' style='margin-left:5px;' alt='Loading' />").insertAfter($('#' + strBtnName));
+                $('#' + strBtnName).prop('disabled', true);
+            } else {
+                $('#' + strBtnName).prop('disabled', false);
+                $('#waiting_' + strBtnName).remove();
+            }
+        }
+
+        function Escape(val) {
+            return val.replace(/'/g, "\\u0027");
+        }
+
+        function formatmultipleoutputs(strVal, strOutputFieldNames) {
+            var strAnswer = '';
+            var _tmpAnswer = '';
+            //console.log("strVal = " + strVal);
+            //console.log("strOutputFieldNames = " + strOutputFieldNames);
+            //console.log("strVal.length = " + strVal.length);
+
+            if (strOutputFieldNames.includes(';') == true) {
+                var res_2 = strOutputFieldNames.split(';');
+                if (Object.keys(strVal).length > 0) {
+                    for (i = 0; i < res_2.length; i++) {
+                        var tmparray = res_2[i].toString().split('|');
+
+                        if (res_2[i] != null && res_2[i].toString() != '') {
+                            _tmpAnswer = "<span class='text-secondary'><i>" + tmparray[1] + "</i></span>"
+                        }
+                        strAnswer = strAnswer + "&nbsp" + formatresult(strVal[i].toString(), tmparray[1]) + "&nbsp" + _tmpAnswer;
+                    }
+                }
+            } else {
+
+                if (strOutputFieldNames != '') {
+                    var tmparray = strOutputFieldNames.toString().split('|');
+                    _tmpAnswer = "<span class='text-secondary'><i>" + tmparray[1] + "</i></span>";
+                    strVal = formatresult(strVal.toString(), tmparray[1]) + "&nbsp" + _tmpAnswer;
+                }
+                strAnswer = strAnswer + replaceAll(strVal, ",", " ") ;
+            }
+            return strAnswer;
+        }
+
+        function htmlEncode(value) {
+            return $('<div/>').text(value).html();
+        }
+
+        function replaceAll(str, find, replace) {
+            return str.replace(new RegExp(find, 'g'), replace);
+        }
+
+        function formatresult(strResult, resulttype) {
+            if (resulttype.startsWith('uint')) {
+                return toFixed(strResult);
+            } else if (resulttype == 'string') {
+                return htmlEncode(strResult);
+                //return hex_to_ascii(strResult);
+            } else if (resulttype == 'address') {
+                if (strResult != '0x0000000000000000000000000000000000000000') {
+                    return "<a href='/address/" + strResult + "' target='_blank'>" + strResult + "</a>";
+                } else {
+                    return htmlEncode(strResult);
+                }
+                //} else if (resulttype == 'bool') {
+                //    return Boolean(remove0x(strResult));
+            } else {
+                return htmlEncode(strResult);
+            }
+        }
+
+        function add0xforAddress(straddress) {
+            straddress = straddress.trim();
+            if (straddress.startsWith("0x") == false && straddress.length == 40) {
+                straddress = "0x" + straddress;
+            }
+            return straddress;
+        }
+
+        function toFixed(x) {
+            if (x.indexOf("e+") !== -1) {
+                var value = new BigNumber(x);
+                x = value.toString(10);
+            }
+            return x;
+        }
+
+        function getParameterByName(name) {
+            var url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        
+        function writeImpl0(method, input) {
+
+            if (isAccount === false) {
+                alert("Please connect to your Web3 provider!");
+
+                return;
+            }
+
+
+            var defaultAccount = eth.defaultAccount
+            var functiontoCall = 'myProxyContractInstance.methods.' + method;
+            var params = [];
+            var ctrl = document.querySelectorAll("[name=" + input + "]");
+            var inputs = [];
+
+            for (var i = 0; i < ctrl.length; i++) {
+                var type = ctrl[i].getAttribute('data-type');
+                var grp = ctrl[i].getAttribute('data-grp');
+                var values = [];
+
+                if (ctrl[i].value == '') {
+                    document.getElementById(input).focus();
+                    alert('Input value cannot be empty');
+                    return false;
+                }
+
+                var value = strip(ctrl[i].value);
+                if (value) {
+                    if (type.indexOf('[') !== -1 && type.indexOf(']') !== -1) values.push(value.split(','));
+                    else values.push(value);
+                } else values.push('');
+
+                inputs.push({ type: type, value: values, grp: grp });
+            }
+
+            var params = encodeParams(inputs);
+            var payableAmountInput = document.getElementById("input_payable_" + method);
+            var payableParam = payableAmountInput && !isNaN(payableAmountInput.value) ? ', value: "' + Web3Utils.toWei(payableAmountInput.value, "ether") + '"' : '';
+
+            try {
+                var f = ""
+                f += functiontoCall + "(" + params + ")"
+                f += ".send("
+                f += "{from: '" + defaultAccount + "'" + payableParam + "}, "
+                f += "function(err, res){"
+                f += "showTx(err, res, '" + input + "');"
+                f += "});"
+
+                new Function(f)();               
+            } catch (err) {
+                showTx(err.message, '', input);
+            }
+
+        }
+
+        
+
+        function write0(method, input) {
+
+
+            $(".write-msg").empty();
+
+            if (isAccount === false) {
+                alert("Please connect to your Web3 provider!");
+
+                return;
+            }
+
+
+            var defaultAccount = eth.defaultAccount
+            var functiontoCall = 'myContractInstance.methods.' + method;
+
+            var params = [];
+            var ctrl = document.querySelectorAll("[name=" + input + "]");
+            var inputs = [];
+
+            for (var i = 0; i < ctrl.length; i++) {
+                var type = ctrl[i].getAttribute('data-type');
+                var grp = ctrl[i].getAttribute('data-grp');
+                var values = [];
+
+                if (ctrl[i].value == '') {
+                    document.getElementById(input).focus();
+                    alert('Input value cannot be empty');
+                    return false;
+                }
+
+                var value = strip(ctrl[i].value);
+                if (value) {
+                    if (type.indexOf('[') !== -1 && type.indexOf(']') !== -1) values.push(value.split(','));
+                    else values.push(value);
+                } else values.push('');
+
+                inputs.push({ type: type, value: values, grp: grp });
+            }
+
+            var params = encodeParams(inputs);
+            var payableAmountInput = document.getElementById("input_payable_" + method);
+            var payableParam = payableAmountInput && !isNaN(payableAmountInput.value) ? ', value: "' + Web3Utils.toWei(payableAmountInput.value, "ether") + '"' : '';
+
+            try {
+                var f = ""
+                f += functiontoCall + "(" + params + ")"
+                f += ".send("
+                f += "{from: '" + defaultAccount + "'" + payableParam + "}, "
+                f += "function(err, res){"
+                f += "showTx(err, res, '" + input + "');"
+                f += "});"
+
+                new Function(f)();
+            } catch (err) {
+                showTx(err.message, '', input);
+            }
+
+        }
+
+        function encodeParams(values) {
+        var params = '';
+
+        if (values.length === 0)
+            return "";
+
+        for (i = 0; i < values.length; i++) {
+            var param = values[i];
+
+            if (param.value !== '') {
+                if (param.grp !== null) {
+                    var _grp = values.filter(x => x.grp == param.grp);
+                    var _grpParam = '';
+
+                    for (g = 0; g < _grp.length; g++) {
+                        param = _grp[g];
+
+                        if (param.value[0] !== '') {
+                            if (g == 0)
+                                _grpParam = '[' + toHex(param.type, Escape(param.value[0]));
+                            else
+                                _grpParam = _grpParam + ',' + toHex(param.type, Escape(param.value[0]));
+                        }
+                    }
+                    _grpParam += ']';
+
+                    if (i == 0)
+                        params += _grpParam;
+                    else
+                        params += ',' + _grpParam;
+
+                    i += _grp.length - 1;
+                }
+                else {
+                    if (i == 0)
+                        params = toHex(param.type, Escape(param.value[0]));
+                    else
+                        params = params + ',' + toHex(param.type, Escape(param.value[0]));
+                }
+            }
+        }
+
+        return params;
+    }
+
+    function Escape(val) {
+
+        if (typeof val === 'string' || val instanceof String)
+            return val.replace(/'/g, "\\u0027");
+        else
+            return val;
+
+    }
+
+    function strip(val) {
+
+
+        val = val.replace(/"/g, '');
+        val = val.replace('[', '');
+        val = val.replace(']', '');
+
+
+        return val;
+    }
+
+     function toHex(type, val) {
+
+        if (Array.isArray(val)) {
+            var param = "[";
+
+            var i;
+            for (i = 0; i < val.length; i++) {
+                if (i == 0)
+                    param += toHex(type, val[i]);
+                else
+                    param = param + ',' + toHex(type, val[i]);
+            }
+            param += "]";
+
+            return param;
+
+        } else {
+            if (type.indexOf('bool') !== -1)
+                return JSON.parse(val);
+            else if (type.indexOf('address') !== -1)
+                return "'" + add0xforAddress(val) + "'"
+            else
+                return "'" + val + "'"
+        }
+
+    };
+
+        function showTx(err, msg, input) {                  
+
+            if (err) {
+                var _err = err;   
+                if (err.message)
+                    _err = err.message;
+
+                $('.' + input).html("<span class='text-danger'>" + _err + "</span>");
+            } else {
+                var _url = '';
+                if (net !== 'bsc_testnet')
+                    _url = net + ".";
+
+                if (msg !== undefined) {
+                    $('.' + input).html("<a class='btn btn-xs btn-primary' href='//" + _url + "explorer.binance.org/smart-testnet/tx/" + msg + "' target='_blank'> View your transaction</a>");
+                    if (input == 'transferToken') {
+                        $("#btnTokenTransfer").attr("disabled", true);
+                    }
+                }
+            }
+        }
+
+        var hash = window.location.hash.substring(1);
+        var myCollectionTab = false;
+        $(document).ready(function () {            
+
+            $.HSCore.components.HSClipboard.init('.js-clipboard');            
+
+            if (hash == 'myCollection') {
+                connectWeb3();
+            } else if (hash != '') {
+                if (hash.indexOf('images-') !== -1) {
+                    hash = 'inventory';
+                    updatehash(hash);
+                    activaTab(hash);
+                } else {
+                    activaTab(hash);
+                }
+            };
+
+            $(window).keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            $('.btn-social').click(function (e) {
+                e.preventDefault();
+                window.open($(this).attr('href'), 'fbShareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
+                return false;
+            });
+
+            window.parent.document.getElementById('overlayMain').style.display = 'none';
+            //connectWeb3();            
+        });        
+
+        function activaTab(tab) {
+            
+            if (tab.indexOf('readContract') >= 0) {
+                tab = 'readContract';
+                window.parent.document.getElementById('overlayMain').style.display = 'none';
+            } else if (tab.indexOf('writeContract') >= 0) {
+                tab = 'writeContract';
+                window.parent.document.getElementById('overlayMain').style.display = 'none';
+            } else if (tab.indexOf('inventory') >= 0) {
+                tab = 'inventory';
+                loadInventoryIframe();
+            } else if (tab.indexOf('myCollection') >= 0) {
+                tab = 'myCollection';                
+                loadMyCollectionTab();
+            } else if (tab.indexOf('comments') >= 0) {
+                tab = 'comments';
+                loaddisqus();
+                window.parent.document.getElementById('overlayMain').style.display = 'none';
+            } else {                
+                updatehash('');
+                window.parent.document.getElementById('overlayMain').style.display = 'none';
+            };
+            $('.nav_tabs1 a[href="#' + tab + '"]').tab('show');
+        }
+
+        function updatehash(strhash) {
+            if (strhash == '') {
+                history.replaceState("", document.title, window.location.pathname);
+            } else {
+                var baseUrl = window.location.href.split('#')[0];
+                history.replaceState("", document.title, baseUrl + '#' + strhash);
+            }
+
+            if (strhash != 'myCollection') {                
+                myCollectionTab = false;
+            }
+        }
+
+        var disqusloaded = false;
+        function loaddisqus() {
+            if (disqusloaded == false) {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                disqusloaded = true;                
+                myCollectionTab = false;
+            }
+            // updatehash('comments');
+        }
+
+        function loadInventoryIframe() {
+            if (window.token_inventory_loaded == false) {
+                document.getElementById('overlayMain').style.display = 'block';
+                document.getElementById('tokenerc721_inventory_pageiframe').src = '/token/generic-tokenholder-inventory?m=' + window.mode + '&contractAddress=0x2C4E74BfA5245300797e803FF91eB8ed80340416&a=';                
+           } else {
+                if (window.isBackButton == true && window.isFrInventory == true) {
+                   console.log("frame force reload");
+                   tokenerc721_inventory_pageiframe.contentWindow.location.reload(true);
+                   window.isFrInventory = false;
+               };
+           };
+        }        
+
+        function renderPagination(requestedPage, totalPage) {
+
+            var strPageDisplayNo = "";
+            var strPageination = "<ul class='pagination pagination-sm mb-0'>";
+            if (requestedPage <= 1) {
+                strPageination += "<li class='page-item disabled'><span class='page-link'>First</span></li>";
+                strPageination += "<li class='page-item disabled'><span class='page-link'><i class='fa fa-chevron-left small'></i></span><span class='sr-only'>Previous</span></li>";
+            } else {
+                if (requestedPage > totalPage) {
+                    requestedPage = totalPage + 1;                    
+                }
+
+                strPageination += "<li class='page-item'>";
+                strPageination += "<a class='page-link' onclick='setPageRequest(1, false, false);loadMyCollectionTab();' href='javascript:;'>";
+                strPageination += "<span aria-hidden='True'>";
+                strPageination += "First";
+                strPageination += "</span>";
+                strPageination += " <span class='sr-only'>First</span></a>";
+                strPageination += "</li>";
+
+                strPageination += "<li class='page-item' title='Go to Previous'>";
+                strPageination += "<a class='page-link' onclick='setPageRequest(" + requestedPage + ", false, true);loadMyCollectionTab();' href='javascript:;' aria-label='Previous'>";
+                strPageination += "<span aria-hidden='True'>";
+                strPageination += "<i class='fa fa-chevron-left small'></i>";
+                strPageination += "</span>";
+                strPageination += " <span class='sr-only'>Previous</span></a>";
+                strPageination += "</li>";
+            }
+
+            var page = "Page X of Y";
+            var xVal = '<strong class="font-weight-medium">' + requestedPage.toString() + '</strong>';
+            var yVal = '<strong class="font-weight-medium">' + totalPage + '</strong>';
+            strPageDisplayNo = page.replace('X', xVal).replace('Y', yVal);
+
+            strPageination += "<li class='page-item disabled'>";
+            strPageination += "<span class='page-link text-nowrap'>" + strPageDisplayNo + "</span>";
+            strPageination += "</li>";
+            strPageination += "";
+            strPageination += "";
+
+            if (requestedPage >= totalPage) {
+                strPageination += "<li class='page-item disabled'><span class='page-link'><i class='fa fa-chevron-right small'></i></span><span class='sr-only'>Previous</span></li>";
+                strPageination += "<li class='page-item disabled'><span class='page-link'>Last</span></li>";
+            } else {
+                strPageination += "<li class='page-item' title='Go to Next'>";
+                strPageination += "<a class='page-link' aria-label='Next' onclick='setPageRequest(" + requestedPage + ", true, false);loadMyCollectionTab();' href='javascript:;'>";
+                strPageination += "<span aria-hidden='True'>";
+                strPageination += "<i class='fa fa-chevron-right small'></i>";
+                strPageination += "</span>";
+                strPageination += " <span class='sr-only'>Next</span></a>";
+                strPageination += "</li>";
+
+                strPageination += "<li class='page-item'>";
+                strPageination += "<a class='page-link' onclick='setPageRequest(" + totalPage + ", false, false);loadMyCollectionTab();' href='javascript:;'>";
+                strPageination += "<span aria-hidden='True'>";
+                strPageination += "Last";
+                strPageination += "</span>";
+                strPageination += " <span class='sr-only'>Last</span></a>";
+                strPageination += "</li>";
+            }
+
+            strPageination += "</ul>";
+
+            return strPageination;
+        }
+
+        function setPageRequest(pageVal, increment, decrement) {
+            if (increment == true) {
+                pageVal = parseInt(pageVal) + 1;
+            }
+
+            if (decrement == true) {
+                pageVal = parseInt(pageVal) - 1;
+            }
+            
+            sessionStorage.setItem("requestedPage", pageVal);
+        }
+
+        function loadMyCollectionOnClick() {
+            if (myCollectionTab == false) {            
+                loadMyCollectionTab();                
+                myCollectionTab = true;
+            }            
+        }
+
+        function loadMyCollectionTab() {
+
+            document.getElementById('overlayMain').style.display = 'block';
+            document.getElementById('loadingtxframe7').style.display = 'block';
+            var contractAddress = "0x2C4E74BfA5245300797e803FF91eB8ed80340416";
+            var userAddress = "";            
+            if (sessionStorage.getItem("userAddress") != "") {
+                userAddress = sessionStorage.getItem("userAddress");
+            }
+            else {
+                userAddress = $("#ContentPlaceHolder1_hdnWalletAddress").val();
+            }
+            
+            var requestedPage = sessionStorage.getItem("requestedPage");
+            $("#spanStatus").empty();
+            $("#grid-container").empty();
+            $("#tokenResultBody").empty();
+            $("#divTopPagination").empty();
+            $("#divBottomPagination").empty();
+
+            $.ajax({
+                dataType: "json",
+                type: 'GET',
+                url: '/dappUserInventory',
+                data: { contractAddress: contractAddress, userAddress: userAddress, requestedPage: requestedPage, sid: sid },
+                success: function (data) {
+                    document.getElementById('overlayMain').style.display = 'none';
+                    document.getElementById('loadingtxframe7').style.display = 'none';
+                    var strPageination = renderPagination(parseInt(data.split('\t')[1]), parseInt(data.split('\t')[2]));                    
+                    $("#spanStatus").append(data.split('\t')[3]);
+                    $("#divTopPagination").append(strPageination);
+                    $("#divBottomPagination").append(strPageination);
+                    if (data.split('\t')[4] == "False") {
+                        $("#divImageInventory").hide();
+                        $("#resulttable").show();
+                        $("#tokenResultBody").append(data.split('\t')[0]);                        
+                    } else {
+                        $("#resulttable").hide();
+                        $("#grid-container").append(data.split('\t')[0]);                        
+                    }
+
+                   
+                    $(".js-fancybox-custom").click(function () {
+                        var index = $(".js-fancybox-custom").index(this);
+                        loadFancyBoxInDappPage($("[data-fancybox-custom]"), index);
+                    });
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                }
+            });
+        }
+
+        function loadFancyBoxInDappPage(obj, index) {
+            $.fancybox.defaults.loop = true;
+            $.fancybox.defaults.animationEffect = "fade";
+            $.fancybox.open(obj, {
+                afterLoad: function (instance, current) {
+                    if (current.width == 0) {
+                        current.width = 400
+                        current.height = 400;
+                    } else if (current.width < 200) {
+                        current.width = current.width * 3;
+                        current.height = current.height * 3;
+                    } else {
+                        current.width = current.width * 1.3;
+                        current.height = current.height * 1.3;
+                    }
+
+                    //if (instance.currIndex === current.index) {
+                        var tokenid = $(this.opts).attr("tokenid");
+                        var owner = $(this.opts).attr("owner");
+                        var contractaddress = $(this.opts).attr("contractaddress");
+
+                        if (tokenid) {
+                            tokenid = "<div class='mb-3'><input type='button' id='btnTransfer' name='btnTransfer' value='Transfer' class='btn btn-xs btn-primary' data-toggle='modal' data-target='#modalTransfer' onclick='clearModal();' data-whatever='" + tokenid + "' /></div>TokenID : #<a href='/token/" + contractaddress + "?a=" + tokenid + "' target='_parent'>" + tokenid + "</a></span>"
+                            $(".fancybox-tokenid-custom").html(tokenid);
+                        }
+
+                        if (owner) {
+                            owner = "<span class='d-block owner'>Owner: <a href='/token/" + contractaddress + "?a=" + owner + "' target='_parent'>" + owner + "</a></span>"
+                            $(".fancybox-owner-custom").html(owner);
+                        }
+                    //}
+                },
+                baseTpl: '<div class="fancybox-container" role="dialog" tabindex="-1">' +
+                    '<div class="fancybox-bg"></div>' +
+                    '<div class="fancybox-inner">' +
+                    '<div class="fancybox-infobar"><span data-fancybox-index></span>&nbsp;/&nbsp;<span data-fancybox-count></span></div>' +
+                    '<div class="fancybox-toolbar">{{buttons}}</div>' +
+                    '<div class="fancybox-navigation">{{arrows}}</div>' +
+                    '<div class="fancybox-stage"></div>' +
+                    '<div class="fancybox-caption fancybox-caption--separate"><div class="fancybox-tokenid-custom fancybox-caption__body"></div><div class="fancybox-owner-custom fancybox-caption__body"></div></div>' +
+                    "</div>" +
+                    "</div>"
+            }, index);            
+        }
+
+        function resizeIframe(obj, addwidth) {
+           setTimeout(function () {
+                 obj.style.height = 0;
+                 obj.style.height = (obj.contentWindow.document.body.scrollHeight + addwidth) + 20 + 'px';
+                 obj.parentElement.style.visibility = 'visible';
+             }, 300); 
+        }
+
+        function loadFancyBox(obj, index) {
+            $.fancybox.defaults.loop = true;
+            $.fancybox.open(obj, {
+                afterLoad: function (instance, current) {
+                    if (current.width == 0) {
+                        current.width = 400
+                        current.height = 400;
+                    } else if (current.width < 200) {
+                        current.width = current.width * 3;
+                        current.height = current.height * 3;
+                    } else {
+                        current.width = current.width * 1.3;
+                        current.height = current.height * 1.3;
+                    }
+
+                    //if (instance.currIndex === current.index) {
+                         var tokenid = $(this.opts).attr("tokenid");
+                        var owner = $(this.opts).attr("owner");
+                        var contractaddress = $(this.opts).attr("contractaddress");
+
+                        if (tokenid) {
+                            tokenid = "TokenID : #<a href='/token/" + contractaddress + "?a=" + tokenid + "' target='_parent'>" + tokenid + "</a></span>"
+                              $(".fancybox-tokenid").html(tokenid);
+                        }
+
+                        if (owner) {
+                            owner = "<span class='d-block owner'>Owner: <a href='/token/" + contractaddress + "?a=" + owner + "' target='_parent'>" + owner + "</a></span>"
+                            $(".fancybox-owner").html(owner);
+                        }        
+                    //}
+                },
+                baseTpl: '<div class="fancybox-container" role="dialog" tabindex="-1">' +
+                          '<div class="fancybox-bg"></div>' +
+                          '<div class="fancybox-inner">' +
+                          '<div class="fancybox-infobar"><span data-fancybox-index></span>&nbsp;/&nbsp;<span data-fancybox-count></span></div>' +
+                          '<div class="fancybox-toolbar">{{buttons}}</div>' +
+                          '<div class="fancybox-navigation">{{arrows}}</div>' +
+                          '<div class="fancybox-stage"></div>' +                          
+                          '<div class="fancybox-caption fancybox-caption--separate"><div class="fancybox-tokenid fancybox-caption__body"></div><div class="fancybox-owner fancybox-caption__body"></div></div>' +
+                          "</div>" +
+                          "</div>"
+            }, index);
+           // obj.fancybox();
+        }
+
+        $('#modalTransfer').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var recipient = button.data('whatever');            
+            $("#txtTransferTokenId").val(recipient);            
+        })
+
+        function clearModal() {
+            $("#txtTransferAddress").val('');
+            $("#txtTransferTokenId").val('');
+            $(".transferToken").empty();
+            $("#btnTokenTransfer").attr("disabled", false);
+        }
+        
+    </script>
+
+
+
+	
+	</td></tr>
+</table>
+</body>
+</html>
